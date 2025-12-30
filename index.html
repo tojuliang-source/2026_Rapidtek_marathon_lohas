@@ -13,11 +13,9 @@
         h2 { text-align: center; color: #003366; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         h3 { color: #555; font-size: 16px; margin-top: 20px; border-left: 4px solid #003366; padding-left: 10px; }
         
-        /* 聲明區塊 */
         .official-notice { background-color: #fff9db; border: 1px solid #f59f00; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 14px; line-height: 1.6; color: #856404; }
         .official-notice b { color: #d9480f; }
 
-        /* 活動資訊區塊 */
         .info-card { background-color: #eef2f7; border-radius: 8px; padding: 15px; margin-bottom: 25px; border: 1px solid #d1d9e6; }
         .info-item { margin-bottom: 10px; font-size: 15px; color: #333; }
         .info-label { font-weight: bold; color: #003366; display: inline-block; width: 85px; }
@@ -37,11 +35,14 @@
         .hidden { display: none !important; }
         footer { text-align: center; font-size: 12px; color: #999; margin-top: 30px; padding-bottom: 10px; }
 
-        /* 切結書彈窗 */
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 999; }
         #agreementBox { background: white; width: 90%; max-width: 700px; max-height: 85vh; padding: 25px; border-radius: 10px; overflow-y: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
         #agreementBody { font-size: 14px; line-height: 1.8; color: #444; text-align: justify; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 5px; white-space: pre-wrap; }
         .warning-title { color: #d9534f; font-weight: bold; margin-top: 15px; display: block; }
+
+        /* 感謝頁面樣式 */
+        #thankYouSection { text-align: center; padding: 40px 10px; }
+        .thank-you-name { font-weight: bold; color: #003366; }
     </style>
 </head>
 <body>
@@ -55,11 +56,10 @@
 </div>
 
 <div class="container">
-    <div class="logo-container">
-        <img src="rapidtek_logo.png" alt="Rapidtek Logo" class="logo-placeholder">
-    </div>
-
     <div id="loginSection">
+        <div class="logo-container">
+            <img src="rapidtek_logo.png" alt="Rapidtek Logo" class="logo-placeholder">
+        </div>
         <h2>員工登入驗證</h2>
         <div class="official-notice">
             本頁面由<b>鐳洋科技職工福利委員會</b>建置，旨在協助同仁統籌收集資料並辦理團體報名。
@@ -77,6 +77,9 @@
     </div>
 
     <form id="surveyForm" class="hidden">
+        <div class="logo-container">
+            <img src="rapidtek_logo.png" alt="Rapidtek Logo" class="logo-placeholder">
+        </div>
         <img src="banner.png" alt="活動橫幅" class="banner-img">
         <h2>2026 鐳洋-路跑活動員工報名表單</h2>
         
@@ -208,6 +211,18 @@
 
         <button type="submit" id="submitBtn">確認提交報名資料</button>
     </form>
+
+    <div id="thankYouSection" class="hidden">
+        <div class="logo-container">
+            <img src="rapidtek_logo.png" alt="Rapidtek Logo" class="logo-placeholder">
+        </div>
+        <h2 style="color: #003366; margin-top: 30px;">報名成功</h2>
+        <p style="font-size: 18px; line-height: 1.8; color: #333;">
+            鐳洋福委感謝 <span id="displayUserName" class="thank-you-name"></span> 報名參加此活動。
+        </p>
+        <p style="color: #666; font-size: 14px; margin-bottom: 30px;">您的資料已成功傳送，請留意後續相關通知。</p>
+        <button type="button" onclick="location.reload()" style="max-width: 200px; margin: 0 auto;">返回首頁</button>
+    </div>
 </div>
 
 <footer>
@@ -216,7 +231,7 @@
 </footer>
 
 <script>
-    // 整合 76 位員工白名單
+    // 員工白名單
     var employeeWhitelist = [
         {id: "RP06001", name: "王奕翔 Arthur", email: "arthur@rapidtek.net"},
         {id: "RP10002", name: "張愛 Vivian", email: "accountant@rapidtek.net"},
@@ -341,6 +356,8 @@
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         var submitBtn = document.getElementById('submitBtn');
+        var userName = document.getElementById('userName').value; // 取得員工姓名
+        
         submitBtn.disabled = true;
         submitBtn.innerText = '資料傳送中...';
 
@@ -350,12 +367,18 @@
 
         fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' })
         .then(function() {
-            alert('報名資料已成功提交予職福會！請檢查電子信箱確認資料。');
-            location.reload();
+            // 隱藏表單
+            document.getElementById('surveyForm').classList.add('hidden');
+            // 設定感謝頁面姓名
+            document.getElementById('displayUserName').innerText = userName;
+            // 顯示感謝頁面
+            document.getElementById('thankYouSection').classList.remove('hidden');
+            window.scrollTo(0, 0);
         })
         .catch(function() {
             alert('網路異常，請稍後再試');
             submitBtn.disabled = false;
+            submitBtn.innerText = '確認提交報名資料';
         });
     });
 </script>
