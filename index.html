@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鐳洋科技 - 2026 路跑活動員工報名系統</title>
+    <style>
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; display: flex; flex-direction: column; min-height: 100vh; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 600px; margin: auto; flex: 1; }
+        .logo-container { text-align: center; margin-bottom: 25px; }
+        .logo-placeholder { width: 220px; height: auto; }
+        .banner-img { width: 100%; height: auto; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee; }
+        h2 { text-align: center; color: #003366; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h3 { color: #555; font-size: 16px; margin-top: 20px; border-left: 4px solid #003366; padding-left: 10px; }
+        
+        /* 聲明區塊 */
+        .official-notice { background-color: #fff9db; border: 1px solid #f59f00; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 14px; line-height: 1.6; color: #856404; }
+        .official-notice b { color: #d9480f; }
+
+        /* 活動資訊區塊 */
+        .info-card { background-color: #eef2f7; border-radius: 8px; padding: 15px; margin-bottom: 25px; border: 1px solid #d1d9e6; }
+        .info-item { margin-bottom: 10px; font-size: 15px; color: #333; }
+        .info-label { font-weight: bold; color: #003366; display: inline-block; width: 85px; }
+        .schedule-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; font-size: 13px; }
+        .schedule-table th, .schedule-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        .schedule-table th { background-color: #003366; color: white; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .note { font-size: 13px; color: #d9534f; margin-bottom: 10px; font-weight: bold; line-height: 1.4; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+        input[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid #ddd; }
+        .row { display: flex; gap: 10px; }
+        .row .form-group { flex: 1; }
+        button { width: 100%; padding: 15px; background-color: #003366; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 18px; margin-top: 20px; font-weight: bold; }
+        button:hover { background-color: #002244; }
+        .hidden { display: none !important; }
+        footer { text-align: center; font-size: 12px; color: #999; margin-top: 30px; padding-bottom: 10px; }
+
+        /* 切結書彈窗 */
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 999; }
+        #agreementBox { background: white; width: 90%; max-width: 700px; max-height: 85vh; padding: 25px; border-radius: 10px; overflow-y: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        #agreementBody { font-size: 14px; line-height: 1.8; color: #444; text-align: justify; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 5px; white-space: pre-wrap; }
+        .warning-title { color: #d9534f; font-weight: bold; margin-top: 15px; display: block; }
+    </style>
+</head>
+<body>
+
+<div id="overlay">
+    <div id="agreementBox">
+        <h2>活動切結書與免責聲明</h2>
+        <div id="agreementBody"></div>
+        <button type="button" onclick="acceptAgreement()">我同意並遵守以上事項</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="logo-container">
+        <img src="rapidtek_logo.png" alt="Rapidtek Logo" class="logo-placeholder">
+    </div>
+
+    <div id="loginSection">
+        <h2>員工登入驗證</h2>
+        <div class="official-notice">
+            本頁面由<b>鐳洋科技職工福利委員會</b>建置，旨在協助同仁統籌收集資料並辦理團體報名。
+            本活動之正式競賽規程、權利義務及參賽規範，悉以<b>「樂活報名網」</b>主辦單位公告為準。
+        </div>
+        <div class="form-group">
+            <label>電子信箱 (公司信箱)</label>
+            <input type="email" id="loginEmail" placeholder="example@rapidtek.net">
+        </div>
+        <div class="form-group">
+            <label>員工工號</label>
+            <input type="text" id="empID" placeholder="請輸入工號 (如: RPxxxxx)">
+        </div>
+        <button type="button" onclick="showSurvey()">驗證並進入報名表單</button>
+    </div>
+
+    <form id="surveyForm" class="hidden">
+        <img src="banner.png" alt="活動橫幅" class="banner-img">
+        <h2>2026 路跑活動員工報名表單</h2>
+        
+        <div class="official-notice">
+            📌 <b>補助說明：</b>本次活動僅限<b>正式員工</b>享有職福會全額補助。若家屬或親友欲陪同參加，請逕自前往 <a href="https://lohasnet.tw/Technology2026/#activity" target="_blank">主辦單位網站</a> 單獨報名。
+        </div>
+
+        <div class="info-card">
+            <h3>🏃 賽事資訊懶人包</h3>
+            <div class="info-item"><span class="info-label">活動日期：</span>2026-04-19 (星期日)</div>
+            <div class="info-item"><span class="info-label">活動地點：</span>台北市中山區美堤河濱公園 (16號水門進入)</div>
+            <div class="info-item"><span class="info-label">建議抵達：</span><b>05:30 - 06:00 (參加者集合、衣物寄放)</b></div>
+            <div class="info-item"><span class="info-label">詳情參考：</span><a href="https://lohasnet.tw/Technology2026/#activity" target="_blank">樂活官方網站活動簡章</a></div>
+            
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>組別</th>
+                        <th>起跑時間</th>
+                        <th>限制時間</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>21公里組</td>
+                        <td>06:45</td>
+                        <td>3小時30分</td>
+                    </tr>
+                    <tr>
+                        <td>10公里組</td>
+                        <td>07:00</td>
+                        <td>2小時</td>
+                    </tr>
+                    <tr>
+                        <td>5公里組</td>
+                        <td>07:15</td>
+                        <td>1小時30分</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>第一部分：基本資料</h3>
+        <div class="form-group">
+            <label>團員姓名 (自動帶入)</label>
+            <input type="text" name="name" id="userName" readonly required>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <label>團員身分證字號</label>
+                <input type="text" name="idNum" required>
+            </div>
+            <div class="form-group">
+                <label>團員性別</label>
+                <select name="gender" required>
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <label>團員生日</label>
+                <input type="date" name="birthday" required>
+            </div>
+            <div class="form-group">
+                <label>行動電話</label>
+                <input type="tel" name="phone" required placeholder="09xxxxxxxx">
+            </div>
+        </div>
+
+        <h3>第二部分：緊急聯絡資訊</h3>
+        <div class="note">※ 緊急聯絡人請勿填寫參加人員，以免活動中延誤緊急聯絡處置</div>
+        <div class="row">
+            <div class="form-group">
+                <label>保證人 (緊急聯絡人) 姓名</label>
+                <input type="text" name="guarantorName" required>
+            </div>
+            <div class="form-group">
+                <label>保證人 (緊急聯絡人) 身分證</label>
+                <input type="text" name="guarantorId" required>
+            </div>
+        </div>
+
+        <h3>第三部分：發票資訊 (職福會統一對外)</h3>
+        <div class="form-group">
+            <label>發票類型 (已鎖定)</label>
+            <input type="text" name="invoiceType" value="公司報帳(三聯式)" readonly>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <label>抬頭 (已鎖定)</label>
+                <input type="text" name="invoiceTitle" value="鐳洋科技股份有限公司職工福利委員會" readonly>
+            </div>
+            <div class="form-group">
+                <label>統一編號 (已鎖定)</label>
+                <input type="text" name="taxId" value="91616791" readonly>
+            </div>
+        </div>
+
+        <h3>第四部分：項目選填</h3>
+        <div class="form-group">
+            <label>競賽項目</label>
+            <select name="category" required>
+                <option value="21公里組">21公里組</option>
+                <option value="10公里組">10公里組</option>
+                <option value="5公里組">5公里組</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>好禮二選一</label>
+            <select name="gift" required>
+                <option value="Panasonic果汁機">Panasonic果汁機</option>
+                <option value="Panasonic掛燙機">Panasonic掛燙機</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>紀念運動衣 (尺寸)</label>
+            <select name="tshirt" required>
+                <option value="紀念運動衣(XXS)">XXS</option>
+                <option value="紀念運動衣(XS)">XS</option>
+                <option value="紀念運動衣(S)">S</option>
+                <option value="紀念運動衣(M)">M</option>
+                <option value="紀念運動衣(L)">L</option>
+                <option value="紀念運動衣(XL)">XL</option>
+                <option value="紀念運動衣(XXL)">XXL</option>
+            </select>
+        </div>
+
+        <button type="submit" id="submitBtn">確認提交報名資料</button>
+    </form>
+</div>
+
+<footer>
+    本系統僅供內部資料收集使用 | 相關賽事規程依照 <a href="https://lohasnet.tw/Technology2026/#activity" target="_blank">主辦單位官網</a> 為準。<br>
+    Rapidtek Technologies Inc. © 2025 All Rights Reserved.
+</footer>
+
+<script>
+    // 整合 76 位員工白名單
+    var employeeWhitelist = [
+        {id: "RP06001", name: "王奕翔 Arthur", email: "arthur@rapidtek.net"},
+        {id: "RP10002", name: "張愛 Vivian", email: "accountant@rapidtek.net"},
+        {id: "RP21021", name: "蔡佳倫 Carol", email: "carol.tsai@rapidtek.net"},
+        {id: "RP20004", name: "胡文修 Matthew", email: "matthew.hu@rapidtek.net"},
+        {id: "RP16003", name: "賴怡雯 Winny", email: "winny.lai@rapidtek.net"},
+        {id: "RP21020", name: "葉莉涵 Vicky", email: "vicky.yeh@rapidtek.net"},
+        {id: "RP24005", name: "林亭均 Celia", email: "pr@rapidtek.net"},
+        {id: "RP25004", name: "楊慧文 Vera", email: "vera.yong@rapidtek.net"},
+        {id: "RP25011", name: "蘇玲郁 Lilyah", email: "lilyah.su@rapidtek.net"},
+        {id: "RP22030", name: "林慧 Dora", email: "dora.lin@rapidtek.net"},
+        {id: "RP25006", name: "蔡靖晨 Ansley", email: "ansley.tsai@rapidtek.net"},
+        {id: "RP24038", name: "詹芳瑜 Fallon", email: "fallon.jan@rapidtek.net"},
+        {id: "RP25007", name: "郭紘志 Jimmy", email: "jimmy.kuo@rapidtek.net"},
+        {id: "RP25009", name: "李岳霖 Melo", email: "melo.lee@rapidtek.net"},
+        {id: "RP25012", name: "林楚瑄 Molly", email: "molly.lin@rapidtek.net"},
+        {id: "RP25016", name: "王奇霖 Kirin", email: "kirin.wang@rapidtek.net"},
+        {id: "RP25013", name: "黃恩佑 Alex", email: "alex.huang@rapidtek.net"},
+        {id: "RP23027", name: "鄭秀梓 Elly", email: "elly.zheng@rapidtek.net"},
+        {id: "RP24028", name: "郭儀君 Yarissa", email: "varissa.kuo@rapidtek.net"},
+        {id: "RP18014", name: "詹人靜 Zoe", email: "zoe.chan@rapidtek.net"},
+        {id: "RP20005", name: "陳觀豪 Kody", email: "mis@rapidtek.net"},
+        {id: "RP24003", name: "陳純雅 Lucy", email: "lucy.chen@rapidtek.net"},
+        {id: "RP21004", name: "鄭珉 Prince", emails: ["prince.jeng@rapidtek.net", "prince.jenq@rapidtek.net"]},
+        {id: "RP24017", name: "廖于 Ruru", email: "ruru.liao@rapidtek.net"},
+        {id: "RP23042", name: "游文華 Robert", email: "robert.yu@rapidtek.net"},
+        {id: "RP06002", name: "李孟慈 Claire", email: "claire@rapidtek.net"},
+        {id: "RP18020", name: "彭俊凱 Kai", email: "kai.peng@rapidtek.net"},
+        {id: "RP23003", name: "朱良 Ryan", email: "ryan.ju@rapidtek.net"},
+        {id: "RP10001", name: "梁虹 May", email: "may_l@rapidtek.net"},
+        {id: "RP20001", name: "王齡 Ling", email: "ling.wang@rapidtek.net"},
+        {id: "RP18009", name: "李冠賢 Sean", email: "sean.lee@rapidtek.net"},
+        {id: "RP24030", name: "林柏川 Frank", email: "frank.lin@rapidtek.net"},
+        {id: "RP25020", name: "詹詠 Daphne", email: "daphne.chan@rapidtek.net"},
+        {id: "RP23005", name: "林致宏 Ben", email: "ben.lin@rapidtek.net"},
+        {id: "RP25018", name: "陳聖樺 Levi", email: "levi.chen@rapidtek.net"},
+        {id: "RP25019", name: "郭於萱 Beryl", email: "beryl.kuo@rapidtek.net"},
+        {id: "RP23033", name: "蔣智中 Alex", email: "alex.chiang@rapidtek.net"},
+        {id: "RP21018", name: "許劭薇 Kate", email: "kate.hsu@rapidtek.net"},
+        {id: "RP24023", name: "吳奕蔵 Wes", email: "wes.wu@rapidtek.net"},
+        {id: "RP24025", name: "許庭瑜 Winnie", email: "winnie.hsu@rapidtek.net"},
+        {id: "RP25014", name: "廖婕妤 Ruby", email: "ruby.liao@rapidtek.net"},
+        {id: "RPC21801", name: "錢立家 Eric", email: "eric.qian@rapidtek.net"},
+        {id: "RPC21802", name: "蘇霈德 Peido", email: "peido.su@rapidtek.net"},
+        {id: "RP24027", name: "郭致宏 Bryant", email: "bryant.kuo@rapidtek.net"},
+        {id: "RP24029", name: "李柔施 Silvia", email: "silvia.lee@rapidtek.net"},
+        {id: "RP24007", name: "林哲毅 Joey", email: "joey.lin@rapidtek.net"},
+        {id: "RP25008", name: "陳游動 Jimmy", email: "jimmy.chen@rapidtek.net"},
+        {id: "RP25021", name: "薛郁樺 Louis", email: "louis.hsueh@rapidtek.net"},
+        {id: "RP17609", name: "陳孟揚 Jason", email: "jason.chen@rapidtek.net"},
+        {id: "RP24034", name: "蘇柏妮 Bernice", email: "bernice.su@rapidtek.net"},
+        {id: "RP25005", name: "陳靖瑋 Jerry", email: "jerry.chen@rapidtek.net"},
+        {id: "RP25017", name: "陳宗佑 Jack", email: "jack.chen@rapidtek.net"},
+        {id: "RP22013", name: "白國威 Kuowei", email: "kuowei.pai@rapidtek.net"},
+        {id: "RP24032", name: "王臣木 CM", email: "cm.wang@rapidtek.net"},
+        {id: "RP23024", name: "李旻哲 Vincent", email: "vincent.lee@rapidtek.net"},
+        {id: "RP24036", name: "陳 Eddie", email: "eddie.chen@rapidtek.net"},
+        {id: "RP17014", name: "張廷耀 Ice", email: "ice.chang@rapidtek.net"},
+        {id: "RP24001", name: "劉長動 Ken", email: "ken.liu@rapidtek.net"},
+        {id: "RP24021", name: "袁登周 Frank", email: "frank.vuan@rapidtek.net"},
+        {id: "RP17001", name: "徐瑋揚 Wade", email: "wade.hsu@rapidtek.net"},
+        {id: "RP24008", name: "林晉丞 Chris", email: "chris.lin@rapidtek.net"},
+        {id: "RP25015", name: "葉松 Ken", email: "ken.yeh@rapidtek.net"},
+        {id: "RP23031", name: "李文基 Vincent", email: "vincentleel@rapidtek.net"},
+        {id: "RP18611", name: "賴素如 Ruru", email: "ruru.lai@rapidtek.net"},
+        {id: "RP21605", name: "宋旻潔 Stacey", email: "stacey.song@rapidtek.net"},
+        {id: "RP24022", name: "許銘 Henry", email: "henry.hsu@rapidtek.net"},
+        {id: "RP18604", name: "吳松哲 Andy", email: "andy.wu@rapidtek.net"},
+        {id: "RP24024", name: "補文彬 Rex", email: "rex.chu@rapidtek.net"},
+        {id: "RP25010", name: "楊裕仁 Edward", email: "edward.yang@rapidtek.net"},
+        {id: "RP14601", name: "蘇育立 Ali", email: "rapidtek.ali@gmail.com"},
+        {id: "RP25003", name: "曾薇 Vivian", email: "vivian.tseng@rapidtek.net"},
+        {id: "RP18028", name: "林家安 Miko", email: "miko.lin@rapidtek.net"},
+        {id: "RP21012", name: "黃詩 Dianne", email: "dianne.huang@rapidtek.net"},
+        {id: "RP23037", name: "許庭瑄 Elsa", email: "elsa.hsu@rapidtek.net"},
+        {id: "RP21609", name: "陳芳欣 Cathy", email: "cathy.chen@rapidtek.net"},
+        {id: "RP24026", name: "黃昭容 Fiona", email: "fiona.huang@rapidtek.net"}
+    ];
+
+    var agreementData = {
+        "content": "【重要聲明】本網頁僅作為鐳洋科技內部員工路跑活動報名資料收集之用。所有參賽規範、保險責任及賽事權利均以「樂活報名網」主辦單位公告之正式規程為最高準則。一旦完成提交，即代表您同意以下切結事項：\n\n本人已詳細閱讀過本活動之競賽規程且同意亦保證遵守大會於競賽規程中所約定之事項，保證本人身心健康，亦了解馬拉松/路跑比賽所需承受之風險，自願參加比賽。競賽中若發生任何意外事件，本人及家屬願意承擔比賽期間所發生之個人意外風險責任，與代辦單位（鐳洋科技職福會）及主辦單位無涉。亦明白此項比賽的錄影、相片、姓名及成績可能於世界各地播放或展出。本人保證提供有效的身份證和資料用於核實身份。一經提交，不得以任何理由要求更換人名、參賽項目或衣服尺寸。嚴禁陪跑。",
+        "notes": [
+            "1. 本報名系統僅供鐳洋科技「正式同仁」使用，由職福會補助全額報名費。",
+            "2. 同仁家屬如欲參賽，請自行前往主辦單位官網報名，不納入本次公司團報補助範圍。",
+            "3. 報名資料提交後將由職福會統一對外匯入主辦單位系統，資料務必填寫正確。"
+        ]
+    };
+
+    window.onload = function() {
+        var body = document.getElementById('agreementBody');
+        var html = agreementData.content + "\n\n<span class='warning-title'>注意事項：</span>\n";
+        agreementData.notes.forEach(function(n) { html += n + "<br>"; });
+        body.innerHTML = html;
+    };
+
+    function acceptAgreement() { document.getElementById('overlay').style.display = 'none'; }
+
+    function showSurvey() {
+        var inputEmail = document.getElementById('loginEmail').value.trim().toLowerCase();
+        var inputID = document.getElementById('empID').value.trim().toUpperCase();
+        var user = employeeWhitelist.find(function(emp) {
+            if (emp.id === inputID) {
+                if (emp.emails) return emp.emails.some(e => e.toLowerCase() === inputEmail);
+                return emp.email.toLowerCase() === inputEmail;
+            }
+            return false;
+        });
+
+        if (user) {
+            document.getElementById('userName').value = user.name;
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('surveyForm').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        } else {
+            alert('驗證失敗：您不在名單內或輸入資料錯誤。本系統僅限鐳洋正式同仁登入。');
+        }
+    }
+
+    var scriptURL = 'https://script.google.com/macros/s/AKfycbwvB04SsgwpY3JnbJKui5J3Y1d2YxIoCj_sC_5fHlQfQ5_pIpdfmQd-jcKrK_FBPEQb/exec';
+    var form = document.getElementById('surveyForm');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = '資料傳送中...';
+
+        var formData = new FormData(form);
+        formData.append('email', document.getElementById('loginEmail').value);
+        formData.append('empID', document.getElementById('empID').value);
+
+        fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' })
+        .then(function() {
+            alert('報名資料已成功提交予職福會！請檢查電子信箱確認資料。');
+            location.reload();
+        })
+        .catch(function() {
+            alert('網路異常，請稍後再試');
+            submitBtn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
